@@ -70,11 +70,20 @@ Inscripciones demostrativas
 
 <div align="center">
   <h3>Vista de Alumnos</h3>
-  <img src="" alt="" width="800">
+  <img src="./src/app/screenshots/captura-1.png" alt="" width="800">
   
-  <h3>Gestión de Cursos</h3>
-  <img src="" alt="" width="800">
+  <h3>Vista de Cursos</h3>
+  <img src="./src/app/screenshots/captura-1.png" alt="" width="800">
   
-  <h3>Inscripciones</h3>
-  <img src="" alt="" width="800">
+  <h3>Vista de Inscripciones</h3>
+  <img src="./src/app/screenshots/captura-1.png" alt="" width="800">
+
+  <h3>Ingresar Alumno</h3>
+  <img src="./src/app/screenshots/captura-1.png" alt="" width="800">
+
+  <h3>Ingresar Curso</h3>
+  <img src="./src/app/screenshots/captura-1.png" alt="" width="800">
+
+  <h3>Ingresar Inscripciones</h3>
+  <img src="./src/app/screenshots/captura-1.png" alt="" width="800">
 </div>
