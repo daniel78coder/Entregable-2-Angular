@@ -27,7 +27,7 @@ import { MatListModule } from '@angular/material/list';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'Sistema Escolar';
+  title = 'Gestion de Alumnos';
   menuItems = [
     { name: 'Alumnos', route: '/alumnos', icon: 'people' },
     { name: 'Cursos', route: '/cursos', icon: 'school' },
