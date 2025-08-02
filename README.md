@@ -1,27 +1,80 @@
-# GestionAlumnosEnAngular
+# Gestion Alumnos En Angular
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.20.
+# 🏫 Sistema de Gestión Educativa - Angular
 
-## Development server
+## 📌 Descripción
+Aplicación web para administrar alumnos, cursos y sus inscripciones, desarrollada con Angular y Angular Material.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## ✨ Características
+- **Alumnos**:
+  - Registro con datos personales
+  - Historial académico
+  - CRUD completo
 
-## Code scaffolding
+- **Cursos**:
+  - Catálogo de materias
+  - Detalles de cada curso
+  - Gestión de profesores
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- **Inscripciones**:
+  - Matrícula de alumnos
+  - Asignación a cursos
+  - Registro de fechas
 
-## Build
+## 🛠 Tecnologías
+| Componente       | Tecnología          |
+|------------------|---------------------|
+| Frontend         | Angular 16+         |
+| UI               | Angular Material    |
+| Estado           | RxJS                |
+| Estructura       | Arquitectura modular|
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## 📂 Estructura de archivos
 
-## Running unit tests
+app/
+├── core/ # Servicios y modelos
+├── features/ # Módulos principales
+├── shared/ # Componentes/pipes comunes
+├── assets/ # Recursos estáticos
+└── environments/ # Configuraciones
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
-## Running end-to-end tests
+## 🚀 Instalación
+1. Clonar repositorio:
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+git clone https://github.com/tu-usuario/tu-repo.git
+cd tu-repo
 
-## Further help
+Instalar dependencias:
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+npm install
+Iniciar servidor:
+
+ng serve
+Abrir en navegador:
+
+text
+http://localhost:4200
+📊 Datos Iniciales
+La aplicación incluye:
+
+5 alumnos de ejemplo
+
+3 cursos pre-cargados
+
+Inscripciones demostrativas
+----------------------------------------------------
+# 🏫 Sistema de Gestión Educativa - Angular
+
+## 📸 Capturas de Pantalla
+
+<div align="center">
+  <h3>Vista de Alumnos</h3>
+  <img src="" alt="" width="800">
+  
+  <h3>Gestión de Cursos</h3>
+  <img src="" alt="" width="800">
+  
+  <h3>Inscripciones</h3>
+  <img src="" alt="" width="800">
+</div>
