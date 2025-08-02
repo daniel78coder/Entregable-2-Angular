@@ -1,0 +1,188 @@
+<div class="container">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h2>Gestión de Inscripciones</h2>
+    </div>
+    <div class="col-md-4 text-end">
+      <button mat-raised-button color="primary" (click)="toggleForm()">
+        <mat-icon>{{ showForm ? "close" : "add" }}</mat-icon>
+        {{ showForm ? "Cancelar" : "Nueva Inscripción" }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Formulario de inscripciones -->
+  <div class="row mb-4" *ngIf="showForm">
+    <div class="col-12">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Agregar Nueva Inscripción</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <form [formGroup]="inscripcionForm" (ngSubmit)="onSubmit()">
+            <div class="row">
+              <div class="col-md-4">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Alumno</mat-label>
+                  <mat-select formControlName="alumnoId">
+                    <mat-option
+                      *ngFor="let alumno of alumnos$ | async"
+                      [value]="alumno.id"
+                    >
+                      {{ alumno.nombre }} {{ alumno.apellido }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error
+                    *ngIf="
+                      inscripcionForm.get('alumnoId')?.hasError('required')
+                    "
+                  >
+                    Debe seleccionar un alumno
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-4">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Curso</mat-label>
+                  <mat-select formControlName="cursoId">
+                    <mat-option
+                      *ngFor="let curso of cursos$ | async"
+                      [value]="curso.id"
+                    >
+                      {{ curso.nombre }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error
+                    *ngIf="inscripcionForm.get('cursoId')?.hasError('required')"
+                  >
+                    Debe seleccionar un curso
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-4">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Estado</mat-label>
+                  <mat-select formControlName="estado">
+                    <mat-option value="Activa">Activa</mat-option>
+                    <mat-option value="Completada">Completada</mat-option>
+                    <mat-option value="Cancelada">Cancelada</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="!inscripcionForm.valid"
+              >
+                Guardar
+              </button>
+              <button mat-button type="button" (click)="toggleForm()">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Buscador
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Buscar inscripciones</mat-label>
+        <input matInput [(ngModel)]="searchText" placeholder="Alumno, curso, estado...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </div> -->
+
+  <!-- Tabla inscripciones -->
+  <div class="row">
+    <div class="col-12">
+      <mat-table [dataSource]="dataSource" class="mat-elevation-4">
+        <ng-container matColumnDef="id">
+          <mat-header-cell *matHeaderCellDef>ID</mat-header-cell>
+          <mat-cell *matCellDef="let inscripcion">{{
+            inscripcion.id
+          }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="alumnoNombre">
+          <mat-header-cell *matHeaderCellDef>Alumno</mat-header-cell>
+          <mat-cell *matCellDef="let inscripcion">{{
+            inscripcion.alumnoNombre
+          }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="cursoNombre">
+          <mat-header-cell *matHeaderCellDef>Curso</mat-header-cell>
+          <mat-cell *matCellDef="let inscripcion">{{
+            inscripcion.cursoNombre
+          }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="fechaInscripcion">
+          <mat-header-cell *matHeaderCellDef>Fecha Inscripción</mat-header-cell>
+          <mat-cell *matCellDef="let inscripcion">{{
+            inscripcion.fechaInscripcion | date : "dd/MM/yyyy"
+          }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="estado">
+          <mat-header-cell *matHeaderCellDef>Estado</mat-header-cell>
+          <mat-cell *matCellDef="let inscripcion">
+            <span
+              [class]="
+                'badge badge-' +
+                (inscripcion.estado === 'Activa'
+                  ? 'success'
+                  : inscripcion.estado === 'Completada'
+                  ? 'primary'
+                  : 'danger')
+              "
+            >
+              {{ inscripcion.estado }}
+            </span>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <mat-header-cell *matHeaderCellDef>Acciones</mat-header-cell>
+          <mat-cell *matCellDef="let inscripcion">
+            <button
+              mat-icon-button
+              color="primary"
+              (click)="verDetalle(inscripcion)"
+              matTooltip="Ver detalle"
+            >
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="accent"
+              (click)="editarInscripcion(inscripcion)"
+              matTooltip="Editar"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="eliminarInscripcion(inscripcion)"
+              matTooltip="Eliminar"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      </mat-table>
+    </div>
+  </div>
+</div>

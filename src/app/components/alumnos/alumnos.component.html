@@ -1,0 +1,172 @@
+<div class="container">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h2>Gestión de Alumnos</h2>
+    </div>
+    <div class="col-md-4 text-end">
+      <button mat-raised-button color="primary" (click)="toggleForm()">
+        <mat-icon>{{ showForm ? "close" : "add" }}</mat-icon>
+        {{ showForm ? "Cancelar" : "Nuevo Alumno" }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Formulario de alumnos -->
+  <div class="row mb-4" *ngIf="showForm">
+    <div class="col-12">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Agregar Nuevo Alumno</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <form [formGroup]="alumnoForm" (ngSubmit)="onSubmit()">
+            <div class="row">
+              <div class="col-md-6">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Nombre</mat-label>
+                  <input matInput formControlName="nombre" />
+                  <mat-error
+                    *ngIf="alumnoForm.get('nombre')?.hasError('required')"
+                  >
+                    El nombre es obligatorio
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-6">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Apellido</mat-label>
+                  <input matInput formControlName="apellido" />
+                  <mat-error
+                    *ngIf="alumnoForm.get('apellido')?.hasError('required')"
+                  >
+                    El apellido es obligatorio
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Email</mat-label>
+                  <input matInput type="email" formControlName="email" />
+                  <mat-error
+                    *ngIf="alumnoForm.get('email')?.hasError('required')"
+                  >
+                    El email es obligatorio
+                  </mat-error>
+                  <mat-error *ngIf="alumnoForm.get('email')?.hasError('email')">
+                    Formato de email inválido
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-6">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Teléfono</mat-label>
+                  <input matInput formControlName="telefono" />
+                  <mat-error
+                    *ngIf="alumnoForm.get('telefono')?.hasError('required')"
+                  >
+                    El teléfono es obligatorio
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="!alumnoForm.valid"
+              >
+                Guardar
+              </button>
+              <button mat-button type="button" (click)="toggleForm()">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Buscador -->
+  <!-- <div class="row mb-3">
+    <div class="col-md-4">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Buscar alumnos</mat-label>
+        <input
+          matInput
+          [(ngModel)]="searchText"
+          placeholder="Nombre, apellido, email..."
+        />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </div> -->
+
+  <!-- Tabla alumnos -->
+  <div class="row">
+    <div class="col-12">
+      <mat-table [dataSource]="dataSource" class="mat-elevation-4">
+        <ng-container matColumnDef="id">
+          <mat-header-cell *matHeaderCellDef>ID</mat-header-cell>
+          <mat-cell *matCellDef="let alumno">{{ alumno.id }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="nombre">
+          <mat-header-cell *matHeaderCellDef>Nombre</mat-header-cell>
+          <mat-cell *matCellDef="let alumno">{{ alumno.nombre }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="apellido">
+          <mat-header-cell *matHeaderCellDef>Apellido</mat-header-cell>
+          <mat-cell *matCellDef="let alumno">{{ alumno.apellido }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="email">
+          <mat-header-cell *matHeaderCellDef>Email</mat-header-cell>
+          <mat-cell *matCellDef="let alumno">{{ alumno.email }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="telefono">
+          <mat-header-cell *matHeaderCellDef>Teléfono</mat-header-cell>
+          <mat-cell *matCellDef="let alumno">{{ alumno.telefono }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <mat-header-cell *matHeaderCellDef>Acciones</mat-header-cell>
+          <mat-cell *matCellDef="let alumno">
+            <button
+              mat-icon-button
+              color="primary"
+              (click)="verDetalle(alumno)"
+              matTooltip="Ver detalle"
+            >
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="accent"
+              (click)="editarAlumno(alumno)"
+              matTooltip="Editar"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="eliminarAlumno(alumno)"
+              matTooltip="Eliminar"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      </mat-table>
+    </div>
+  </div>
+</div>
