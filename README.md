@@ -86,4 +86,14 @@ Inscripciones demostrativas
 
   <h3>Ingresar Inscripciones</h3>
   <img src="./src/app/screenshots/captura-6.png" alt="" width="800">
+
+  <h3>Detalle Alumno</h3>
+  <img src="./src/app/screenshots/captura-7.png" alt="" width="800">
+
+  <h3>Detalle Cursos</h3>
+  <img src="./src/app/screenshots/captura-8.png" alt="" width="800">
+
+  <h3>Detalle Inscripciones</h3>
+  <img src="./src/app/screenshots/captura-9.png" alt="" width="800">
+
 </div>
