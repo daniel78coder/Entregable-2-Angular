@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 import { Alumno, Curso, Inscripcion } from '../models/models';
 
 @Injectable({
@@ -78,63 +79,87 @@ export class DataService {
     },
   ]);
 
-  // Aca tengo los metodos para alumnos
+  // Alumnos
   getAlumnos(): Observable<Alumno[]> {
     return this.alumnos$.asObservable();
   }
 
   addAlumno(alumno: Omit<Alumno, 'id'>): Observable<Alumno> {
-    const current = this.alumnos$.value;
-    const newId =
-      current.length > 0 ? Math.max(...current.map((a) => a.id)) + 1 : 1;
-    const newAlumno = { ...alumno, id: newId };
-    this.alumnos$.next([...current, newAlumno]);
-    return of(newAlumno);
+    return this.alumnos$.pipe(
+      take(1),
+      map((current) => {
+        const newId =
+          current.length > 0 ? Math.max(...current.map((a) => a.id)) + 1 : 1;
+        const newAlumno = { ...alumno, id: newId };
+        this.alumnos$.next([...current, newAlumno]);
+        return newAlumno;
+      })
+    );
   }
 
   updateAlumno(alumno: Alumno): Observable<Alumno> {
-    const alumnos = this.alumnos$.value.map((a) =>
-      a.id === alumno.id ? alumno : a
+    return this.alumnos$.pipe(
+      take(1),
+      map((current) => {
+        const updated = current.map((a) => (a.id === alumno.id ? alumno : a));
+        this.alumnos$.next(updated);
+        return alumno;
+      })
     );
-    this.alumnos$.next(alumnos);
-    return of(alumno);
   }
 
   deleteAlumno(id: number): Observable<boolean> {
-    const alumnos = this.alumnos$.value.filter((a) => a.id !== id);
-    this.alumnos$.next(alumnos);
-    return of(true);
+    return this.alumnos$.pipe(
+      take(1),
+      map((current) => {
+        const updated = current.filter((a) => a.id !== id);
+        this.alumnos$.next(updated);
+        return true;
+      })
+    );
   }
 
-  // Aca tengo los metodos  para cursos
+  // Cursos
   getCursos(): Observable<Curso[]> {
     return this.cursos$.asObservable();
   }
 
   addCurso(curso: Omit<Curso, 'id'>): Observable<Curso> {
-    const current = this.cursos$.value;
-    const newId =
-      current.length > 0 ? Math.max(...current.map((c) => c.id)) + 1 : 1;
-    const newCurso = { ...curso, id: newId };
-    this.cursos$.next([...current, newCurso]);
-    return of(newCurso);
+    return this.cursos$.pipe(
+      take(1),
+      map((current) => {
+        const newId =
+          current.length > 0 ? Math.max(...current.map((c) => c.id)) + 1 : 1;
+        const newCurso = { ...curso, id: newId };
+        this.cursos$.next([...current, newCurso]);
+        return newCurso;
+      })
+    );
   }
 
   updateCurso(curso: Curso): Observable<Curso> {
-    const cursos = this.cursos$.value.map((c) =>
-      c.id === curso.id ? curso : c
+    return this.cursos$.pipe(
+      take(1),
+      map((current) => {
+        const updated = current.map((c) => (c.id === curso.id ? curso : c));
+        this.cursos$.next(updated);
+        return curso;
+      })
     );
-    this.cursos$.next(cursos);
-    return of(curso);
   }
 
   deleteCurso(id: number): Observable<boolean> {
-    const cursos = this.cursos$.value.filter((c) => c.id !== id);
-    this.cursos$.next(cursos);
-    return of(true);
+    return this.cursos$.pipe(
+      take(1),
+      map((current) => {
+        const updated = current.filter((c) => c.id !== id);
+        this.cursos$.next(updated);
+        return true;
+      })
+    );
   }
 
-  // Aca tengo los metodos para inscripciones
+  // Inscripciones
   getInscripciones(): Observable<Inscripcion[]> {
     return this.inscripciones$.asObservable();
   }
@@ -142,25 +167,47 @@ export class DataService {
   addInscripcion(
     inscripcion: Omit<Inscripcion, 'id'>
   ): Observable<Inscripcion> {
-    const current = this.inscripciones$.value;
-    const newId =
-      current.length > 0 ? Math.max(...current.map((i) => i.id)) + 1 : 1;
-    const newInscripcion = { ...inscripcion, id: newId };
-    this.inscripciones$.next([...current, newInscripcion]);
-    return of(newInscripcion);
+    return this.inscripciones$.pipe(
+      take(1),
+      map((current) => {
+        const newId =
+          current.length > 0 ? Math.max(...current.map((i) => i.id)) + 1 : 1;
+        const newInscripcion = { ...inscripcion, id: newId };
+        this.inscripciones$.next([...current, newInscripcion]);
+        return newInscripcion;
+      })
+    );
   }
 
   updateInscripcion(inscripcion: Inscripcion): Observable<Inscripcion> {
-    const inscripciones = this.inscripciones$.value.map((i) =>
-      i.id === inscripcion.id ? inscripcion : i
+    return this.inscripciones$.pipe(
+      take(1),
+      map((current) => {
+        const updated = current.map((i) =>
+          i.id === inscripcion.id ? inscripcion : i
+        );
+        this.inscripciones$.next(updated);
+        return inscripcion;
+      })
     );
-    this.inscripciones$.next(inscripciones);
-    return of(inscripcion);
   }
 
   deleteInscripcion(id: number): Observable<boolean> {
-    const inscripciones = this.inscripciones$.value.filter((i) => i.id !== id);
-    this.inscripciones$.next(inscripciones);
-    return of(true);
+    return this.inscripciones$.pipe(
+      take(1),
+      map((current) => {
+        const updated = current.filter((i) => i.id !== id);
+        this.inscripciones$.next(updated);
+        return true;
+      })
+    );
+  }
+
+  // Métodos combinados (ejemplo usando combineLatest)
+  // Métodos combinados usando combineLatest
+  getAlumnosConCursos(): Observable<{ alumnos: Alumno[]; cursos: Curso[] }> {
+    return combineLatest([this.alumnos$, this.cursos$]).pipe(
+      map(([alumnos, cursos]) => ({ alumnos, cursos }))
+    );
   }
 }

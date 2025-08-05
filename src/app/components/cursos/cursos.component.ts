@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { DataService } from '../../shared/services/data.service';
@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-cursos',
@@ -31,7 +32,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   ],
   templateUrl: './cursos.component.html',
 })
-export class CursosComponent implements OnInit {
+export class CursosComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<Curso>([]);
   cursoForm: FormGroup;
   displayedColumns: string[] = [
@@ -45,6 +46,7 @@ export class CursosComponent implements OnInit {
   searchText = '';
   showForm = false;
   editingId: number | null = null;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private dataService: DataService,
@@ -64,11 +66,27 @@ export class CursosComponent implements OnInit {
     this.loadCursos();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   loadCursos(): void {
-    this.dataService.getCursos().subscribe((cursos) => {
-      this.dataSource.data = cursos;
-      this.applyFilter();
-    });
+    this.dataService
+      .getCursos()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (cursos) => {
+          this.dataSource.data = cursos;
+          this.applyFilter();
+        },
+        error: (error) => {
+          this.snackBar.open('Error al cargar cursos', 'Cerrar', {
+            duration: 3000,
+          });
+          console.error(error);
+        },
+      });
   }
 
   applyFilter(): void {
@@ -77,37 +95,31 @@ export class CursosComponent implements OnInit {
 
   onSubmit(): void {
     if (this.cursoForm.valid) {
-      const cursoData = this.cursoForm.value;
+      const cursoData = this.cursoForm.value as Omit<Curso, 'id'>;
 
-      if (this.editingId) {
-        this.dataService
-          .updateCurso({ ...cursoData, id: this.editingId })
-          .subscribe({
-            next: () => {
-              this.snackBar.open('Curso actualizado', 'Cerrar', {
-                duration: 3000,
-              });
-              this.resetForm();
-              this.loadCursos();
-            },
-            error: (error) => {
-              this.snackBar.open('Error al actualizar', 'Cerrar');
-              console.error(error);
-            },
-          });
-      } else {
-        this.dataService.addCurso(cursoData).subscribe({
-          next: () => {
-            this.snackBar.open('Curso creado', 'Cerrar', { duration: 3000 });
-            this.resetForm();
-            this.loadCursos();
-          },
-          error: (error) => {
-            this.snackBar.open('Error al crear', 'Cerrar');
-            console.error(error);
-          },
-        });
-      }
+      const operation$ = this.editingId
+        ? this.dataService.updateCurso({ ...cursoData, id: this.editingId })
+        : this.dataService.addCurso(cursoData);
+
+      operation$.pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          this.snackBar.open(
+            `Curso ${this.editingId ? 'actualizado' : 'creado'} correctamente`,
+            'Cerrar',
+            { duration: 3000 }
+          );
+          this.resetForm();
+          this.loadCursos();
+        },
+        error: (error) => {
+          this.snackBar.open(
+            `Error al ${this.editingId ? 'actualizar' : 'crear'} curso`,
+            'Cerrar',
+            { duration: 3000 }
+          );
+          console.error(error);
+        },
+      });
     }
   }
 
@@ -135,27 +147,27 @@ Precio: $${curso.precio}`;
 
   editarCurso(curso: Curso): void {
     this.editingId = curso.id;
-    this.cursoForm.patchValue({
-      nombre: curso.nombre,
-      descripcion: curso.descripcion,
-      duracion: curso.duracion,
-      precio: curso.precio,
-    });
+    this.cursoForm.patchValue(curso);
     this.showForm = true;
   }
 
   eliminarCurso(curso: Curso): void {
     if (confirm(`¿Eliminar el curso "${curso.nombre}"?`)) {
-      this.dataService.deleteCurso(curso.id).subscribe({
-        next: () => {
-          this.snackBar.open('Curso eliminado', 'Cerrar', { duration: 3000 });
-          this.loadCursos();
-        },
-        error: (error) => {
-          this.snackBar.open('Error al eliminar', 'Cerrar');
-          console.error(error);
-        },
-      });
+      this.dataService
+        .deleteCurso(curso.id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.snackBar.open('Curso eliminado', 'Cerrar', { duration: 3000 });
+            this.loadCursos();
+          },
+          error: (error) => {
+            this.snackBar.open('Error al eliminar curso', 'Cerrar', {
+              duration: 3000,
+            });
+            console.error(error);
+          },
+        });
     }
   }
 }

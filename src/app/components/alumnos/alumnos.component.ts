@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { DataService } from '../../shared/services/data.service';
@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-alumnos',
@@ -31,7 +32,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   ],
   templateUrl: './alumnos.component.html',
 })
-export class AlumnosComponent implements OnInit {
+export class AlumnosComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<Alumno>([]);
   alumnoForm: FormGroup;
   displayedColumns: string[] = [
@@ -45,6 +46,7 @@ export class AlumnosComponent implements OnInit {
   searchText = '';
   showForm = false;
   editingId: number | null = null;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private dataService: DataService,
@@ -64,11 +66,19 @@ export class AlumnosComponent implements OnInit {
     this.loadAlumnos();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   loadAlumnos(): void {
-    this.dataService.getAlumnos().subscribe((alumnos) => {
-      this.dataSource.data = alumnos;
-      this.applyFilter();
-    });
+    this.dataService
+      .getAlumnos()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((alumnos) => {
+        this.dataSource.data = alumnos;
+        this.applyFilter();
+      });
   }
 
   applyFilter(): void {
@@ -77,37 +87,31 @@ export class AlumnosComponent implements OnInit {
 
   onSubmit(): void {
     if (this.alumnoForm.valid) {
-      const alumnoData = this.alumnoForm.value;
+      const alumnoData = this.alumnoForm.value as Omit<Alumno, 'id'>;
 
-      if (this.editingId) {
-        this.dataService
-          .updateAlumno({ ...alumnoData, id: this.editingId })
-          .subscribe({
-            next: () => {
-              this.snackBar.open('Alumno actualizado', 'Cerrar', {
-                duration: 3000,
-              });
-              this.resetForm();
-              this.loadAlumnos();
-            },
-            error: (error) => {
-              this.snackBar.open('Error al actualizar', 'Cerrar');
-              console.error(error);
-            },
-          });
-      } else {
-        this.dataService.addAlumno(alumnoData).subscribe({
-          next: () => {
-            this.snackBar.open('Alumno creado', 'Cerrar', { duration: 3000 });
-            this.resetForm();
-            this.loadAlumnos();
-          },
-          error: (error) => {
-            this.snackBar.open('Error al crear', 'Cerrar');
-            console.error(error);
-          },
-        });
-      }
+      const operation$ = this.editingId
+        ? this.dataService.updateAlumno({ ...alumnoData, id: this.editingId })
+        : this.dataService.addAlumno(alumnoData);
+
+      operation$.pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          this.snackBar.open(
+            `Alumno ${this.editingId ? 'actualizado' : 'creado'} correctamente`,
+            'Cerrar',
+            { duration: 3000 }
+          );
+          this.resetForm();
+          this.loadAlumnos();
+        },
+        error: (error) => {
+          this.snackBar.open(
+            `Error al ${this.editingId ? 'actualizar' : 'crear'} alumno`,
+            'Cerrar',
+            { duration: 3000 }
+          );
+          console.error(error);
+        },
+      });
     }
   }
 
@@ -135,27 +139,29 @@ Teléfono: ${alumno.telefono}`;
 
   editarAlumno(alumno: Alumno): void {
     this.editingId = alumno.id;
-    this.alumnoForm.patchValue({
-      nombre: alumno.nombre,
-      apellido: alumno.apellido,
-      email: alumno.email,
-      telefono: alumno.telefono,
-    });
+    this.alumnoForm.patchValue(alumno);
     this.showForm = true;
   }
 
   eliminarAlumno(alumno: Alumno): void {
     if (confirm(`¿Eliminar a ${alumno.nombre} ${alumno.apellido}?`)) {
-      this.dataService.deleteAlumno(alumno.id).subscribe({
-        next: () => {
-          this.snackBar.open('Alumno eliminado', 'Cerrar', { duration: 3000 });
-          this.loadAlumnos();
-        },
-        error: (error) => {
-          this.snackBar.open('Error al eliminar', 'Cerrar');
-          console.error(error);
-        },
-      });
+      this.dataService
+        .deleteAlumno(alumno.id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.snackBar.open('Alumno eliminado', 'Cerrar', {
+              duration: 3000,
+            });
+            this.loadAlumnos();
+          },
+          error: (error) => {
+            this.snackBar.open('Error al eliminar alumno', 'Cerrar', {
+              duration: 3000,
+            });
+            console.error(error);
+          },
+        });
     }
   }
 }
