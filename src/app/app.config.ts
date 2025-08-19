@@ -2,6 +2,7 @@ import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
+import { HttpClientModule } from '@angular/common/http';
 
 // Importaciones de angular material
 import { MatTableModule } from '@angular/material/table';
@@ -37,7 +38,8 @@ export const appConfig: ApplicationConfig = {
       MatSidenavModule,
       MatListModule,
       MatToolbarModule,
-      MatDialogModule
+      MatDialogModule,
+      HttpClientModule
     ),
   ],
 };

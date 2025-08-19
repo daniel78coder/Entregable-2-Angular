@@ -203,8 +203,6 @@ export class DataService {
     );
   }
 
-  // Métodos combinados (ejemplo usando combineLatest)
-  // Métodos combinados usando combineLatest
   getAlumnosConCursos(): Observable<{ alumnos: Alumno[]; cursos: Curso[] }> {
     return combineLatest([this.alumnos$, this.cursos$]).pipe(
       map(([alumnos, cursos]) => ({ alumnos, cursos }))

@@ -8,6 +8,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
+import { AuthService } from './auth.service';
 
 @Component({
   selector: 'app-root',
@@ -33,4 +34,6 @@ export class AppComponent {
     { name: 'Cursos', route: '/cursos', icon: 'school' },
     { name: 'Inscripciones', route: '/inscripciones', icon: 'assignment' },
   ];
+
+  constructor(public authService: AuthService) {}
 }
