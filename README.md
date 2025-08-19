@@ -37,7 +37,7 @@ app/
 ├── shared/ # Componentes/pipes comunes
 ├── assets/ # Recursos estáticos
 └── environments/ # Configuraciones
-** se agrega login ( usuario admin password: admin123) **
+## se agrega login ( usuario: admin - password: admin123) 
 
 
 ## 🚀 Instalación
